@@ -16,6 +16,8 @@ namespace TournamentPlanner.Data
         public Player Player2 { get; set; }
 
         public int Player2ID { get; set; }
+        public Player Winner { get; set; }
+        public int WinnerID { get; set; }
 
         // This class is NOT COMPLETE.
         // Todo: Complete the class according to the requirements

@@ -30,7 +30,12 @@ namespace TournamentPlanner.Data
                     .WithMany()
                     .HasForeignKey(m => m.Player2ID)
                     .OnDelete(DeleteBehavior.NoAction);
-            }
+                modelBuilder.Entity<Match>()
+                    .HasOne(m => m.Winner)
+                    .WithMany()
+                    .HasForeignKey(m => m.WinnerID)
+                    .OnDelete(DeleteBehavior.NoAction);
+        }
             // This class is NOT COMPLETE.
             // Todo: Complete the class according to the requirements
 
@@ -41,7 +46,7 @@ namespace TournamentPlanner.Data
             /// <returns>Player after it has been added to the DB</returns>
             public async Task<Player> AddPlayer(Player newPlayer)
             {
-                Players.Add(newPlayer);
+                await Players.AddAsync(newPlayer);
                 await SaveChangesAsync();
                 return newPlayer;
             }
@@ -56,6 +61,7 @@ namespace TournamentPlanner.Data
         public async Task<Match> AddMatch(int player1Id, int player2Id, int round)
         {
             var match = new Match { Player1ID = player1Id, Player2ID = player2Id, Round = round };
+            await Matches.AddAsync(match);
             await SaveChangesAsync();
             return match;
         }
@@ -66,9 +72,20 @@ namespace TournamentPlanner.Data
         /// <param name="matchId">ID of the match to update</param>
         /// <param name="player">Player who has won the match</param>
         /// <returns>Match after it has been updated in the DB</returns>
-        public Task<Match> SetWinner(int matchId, PlayerNumber player)
+        public async Task<Match> SetWinner(int matchId, PlayerNumber player)
         {
-            throw new NotImplementedException();
+            var match = Matches.Find(matchId);
+            if (PlayerNumber.Player1 == player)
+            {
+                match.WinnerID = match.Player1ID;
+            }
+            else
+            {
+                match.WinnerID = match.Player2ID;
+            }
+            await SaveChangesAsync();
+
+            return match;
         }
 
         /// <summary>
@@ -83,9 +100,17 @@ namespace TournamentPlanner.Data
         /// <summary>
         /// Delete everything (matches, players)
         /// </summary>
-        public Task DeleteEverything()
+        public async Task DeleteEverything()
         {
-            throw new NotImplementedException();
+            foreach (var player in Players)
+            {
+                Players.Remove(player);
+            }
+            foreach (var match in Matches)
+            {
+                Matches.Remove(match);
+            }
+            await SaveChangesAsync();
         }
 
         /// <summary>
