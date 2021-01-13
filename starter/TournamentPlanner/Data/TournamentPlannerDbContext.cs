@@ -10,22 +10,41 @@ namespace TournamentPlanner.Data
 
     public class TournamentPlannerDbContext : DbContext
     {
+        public DbSet<Player> Players { get; set; }
+        public DbSet<Match> Matches { get; set; }
         public TournamentPlannerDbContext(DbContextOptions<TournamentPlannerDbContext> options)
             : base(options)
         { }
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                base.OnModelCreating(modelBuilder);
 
-        // This class is NOT COMPLETE.
-        // Todo: Complete the class according to the requirements
+                modelBuilder.Entity<Match>()
+                    .HasOne(m => m.Player1)
+                    .WithMany()
+                    .HasForeignKey(m => m.Player1ID)
+                    .OnDelete(DeleteBehavior.NoAction);
 
-        /// <summary>
-        /// Adds a new player to the player table
-        /// </summary>
-        /// <param name="newPlayer">Player to add</param>
-        /// <returns>Player after it has been added to the DB</returns>
-        public Task<Player> AddPlayer(Player newPlayer)
-        {
-            throw new NotImplementedException();
-        }
+                modelBuilder.Entity<Match>()
+                    .HasOne(m => m.Player2)
+                    .WithMany()
+                    .HasForeignKey(m => m.Player2ID)
+                    .OnDelete(DeleteBehavior.NoAction);
+            }
+            // This class is NOT COMPLETE.
+            // Todo: Complete the class according to the requirements
+
+            /// <summary>
+            /// Adds a new player to the player table
+            /// </summary>
+            /// <param name="newPlayer">Player to add</param>
+            /// <returns>Player after it has been added to the DB</returns>
+            public async Task<Player> AddPlayer(Player newPlayer)
+            {
+                Players.Add(newPlayer);
+                await SaveChangesAsync();
+                return newPlayer;
+            }
 
         /// <summary>
         /// Adds a match between two players
@@ -34,9 +53,11 @@ namespace TournamentPlanner.Data
         /// <param name="player2Id">ID of player 2</param>
         /// <param name="round">Number of the round</param>
         /// <returns>Generated match after it has been added to the DB</returns>
-        public Task<Match> AddMatch(int player1Id, int player2Id, int round)
+        public async Task<Match> AddMatch(int player1Id, int player2Id, int round)
         {
-            throw new NotImplementedException();
+            var match = new Match { Player1ID = player1Id, Player2ID = player2Id, Round = round };
+            await SaveChangesAsync();
+            return match;
         }
 
         /// <summary>

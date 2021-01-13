@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace TournamentPlanner.Data
 {
@@ -8,7 +9,16 @@ namespace TournamentPlanner.Data
 
         public int Round { get; set; }
 
+        public Player Player1 { get; set; }
+
+        public int Player1ID { get; set; }
+
+        public Player Player2 { get; set; }
+
+        public int Player2ID { get; set; }
+
         // This class is NOT COMPLETE.
         // Todo: Complete the class according to the requirements
     }
 }
+
